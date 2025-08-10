@@ -69,6 +69,7 @@ def fillData(soup):
 def CreateTrainingSet(allData,cityName):
     try:
         filePath = 'Set/trainingSet{}.txt'.format(cityName)
+        filePath = 'set/trainingSet{}.txt'.format(cityName)
 
         lines = []
         for sublist in allData:
