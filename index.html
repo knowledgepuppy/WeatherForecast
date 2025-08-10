@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>天气预测与铁塔风荷载计算系统</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>天气预测与铁塔风荷载计算系统</h1>
+            <nav class="nav-tabs">
+                <button class="tab-btn active" data-tab="weather">天气预测</button>
+                <button class="tab-btn" data-tab="tower">风荷载计算</button>
+            </nav>
+        </header>
+
+        <!-- 天气预测模块 -->
+        <div id="weather-tab" class="tab-content active">
+            <div class="weather-section">
+                <h2>天气预测系统</h2>
+                <div class="input-group">
+                    <label for="city-input">城市名称：</label>
+                    <input type="text" id="city-input" placeholder="请输入城市名称">
+                    <button id="predict-btn">开始预测</button>
+                </div>
+                <div id="weather-results" class="results-section">
+                    <div id="weather-loading" class="loading hidden">正在预测中...</div>
+                    <div id="weather-data" class="weather-data"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 铁塔风荷载计算模块 -->
+        <div id="tower-tab" class="tab-content">
+            <div class="tower-section">
+                <h2>铁塔风荷载计算系统</h2>
+                
+                <div class="input-panels">
+                    <!-- 铁塔参数输入 -->
+                    <div class="input-panel">
+                        <h3>铁塔基本参数</h3>
+                        <div class="form-group">
+                            <label for="tower-height">铁塔总高度 (m)：</label>
+                            <input type="number" id="tower-height" value="50" min="10" max="200">
+                        </div>
+                        <div class="form-group">
+                            <label for="tower-segments">分段数量：</label>
+                            <input type="number" id="tower-segments" value="10" min="5" max="20">
+                        </div>
+                        <div class="form-group">
+                            <label for="base-width">塔底宽度 (m)：</label>
+                            <input type="number" id="base-width" value="4" min="1" max="10" step="0.1">
+                        </div>
+                        <div class="form-group">
+                            <label for="top-width">塔顶宽度 (m)：</label>
+                            <input type="number" id="top-width" value="1" min="0.5" max="5" step="0.1">
+                        </div>
+                        <div class="form-group">
+                            <label for="drag-coefficient">阻力系数：</label>
+                            <input type="number" id="drag-coefficient" value="1.2" min="0.5" max="2.0" step="0.1">
+                        </div>
+                    </div>
+
+                    <!-- 环境参数输入 -->
+                    <div class="input-panel">
+                        <h3>环境参数</h3>
+                        <div class="form-group">
+                            <label for="base-wind-speed">地面基准风速 (m/s)：</label>
+                            <input type="number" id="base-wind-speed" value="25" min="5" max="50">
+                        </div>
+                        <div class="form-group">
+                            <label for="terrain-type">地形类别：</label>
+                            <select id="terrain-type">
+                                <option value="A">A类 - 平坦开阔地面</option>
+                                <option value="B" selected>B类 - 农田、村镇</option>
+                                <option value="C">C类 - 有密集建筑群的城市市区</option>
+                                <option value="D">D类 - 有密集建筑群且房屋较高的城市市区</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="altitude">海拔高度 (m)：</label>
+                            <input type="number" id="altitude" value="100" min="0" max="5000">
+                        </div>
+                        <div class="form-group">
+                            <label for="turbulence">湍流强度：</label>
+                            <input type="number" id="turbulence" value="0.15" min="0.1" max="0.3" step="0.01">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="calculation-controls">
+                    <button id="calculate-btn" class="calculate-btn">计算风荷载</button>
+                    <button id="export-btn" class="export-btn">导出报告</button>
+                </div>
+
+                <!-- 计算结果显示 -->
+                <div id="tower-results" class="results-section">
+                    <div id="tower-loading" class="loading hidden">正在计算中...</div>
+                    
+                    <!-- 数值结果表格 -->
+                    <div id="results-table" class="results-table hidden">
+                        <h3>风荷载计算结果</h3>
+                        <div class="table-container">
+                            <table id="load-table">
+                                <thead>
+                                    <tr>
+                                        <th>高度 (m)</th>
+                                        <th>风速 (m/s)</th>
+                                        <th>风压 (Pa)</th>
+                                        <th>截面积 (m²)</th>
+                                        <th>风荷载 (N)</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="table-body">
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="summary-stats">
+                            <div class="stat-item">
+                                <span class="stat-label">总风荷载：</span>
+                                <span id="total-load" class="stat-value">0 N</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">最大单点荷载：</span>
+                                <span id="max-load" class="stat-value">0 N</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">平均风速：</span>
+                                <span id="avg-wind-speed" class="stat-value">0 m/s</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 可视化图表 -->
+                    <div id="charts-container" class="charts-container hidden">
+                        <div class="chart-panel">
+                            <h4>风荷载沿高度分布</h4>
+                            <canvas id="load-chart"></canvas>
+                        </div>
+                        <div class="chart-panel">
+                            <h4>风速剖面</h4>
+                            <canvas id="wind-profile-chart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="main.js"></script>
+</body>
+</html>
